@@ -1,6 +1,6 @@
 """
 Unified Game Data Model.
-Standardizes football game data across both NFL and College Football APIs.
+Standardizes football game data across both NFL and College Football APIs with branding, records, and weather.
 """
 
 from dataclasses import dataclass
@@ -11,20 +11,6 @@ from typing import Optional
 class Game:
     """
     Represents a single football game (NFL or CFB).
-    
-    Attributes:
-        id: Unique identifier for the game.
-        sport: League name ('NFL' or 'CFB').
-        home_team: Name of the home team.
-        away_team: Name of the away team.
-        home_score: Current or final score of home team (None if not started).
-        away_score: Current or final score of away team (None if not started).
-        status: Game status ('Scheduled', 'Live', 'Final', 'Postponed').
-        start_time: Human-readable scheduled start time (e.g. '8:15 PM ET' or '2026-09-06 20:15').
-        period_or_quarter: Current quarter/period info (e.g. 'Q2 4:15', 'Halftime', or 'Final').
-        venue: Stadium or location name.
-        broadcast: TV channel or streaming platform (e.g. 'ESPN', 'FOX', 'NBC').
-        is_live: True if game is currently in progress.
     """
     id: str
     sport: str
@@ -32,17 +18,26 @@ class Game:
     away_team: str
     home_score: Optional[int] = None
     away_score: Optional[int] = None
+    home_record: Optional[str] = None
+    away_record: Optional[str] = None
+    home_rank: Optional[str] = None
+    away_rank: Optional[str] = None
     status: str = "Scheduled"
     start_time: str = ""
     period_or_quarter: str = ""
     venue: str = ""
     broadcast: str = ""
+    weather: Optional[str] = None
+    home_color: Optional[str] = None
+    away_color: Optional[str] = None
     is_live: bool = False
 
     @property
     def matchup_title(self) -> str:
         """Returns a formatted matchup title, e.g. 'Chiefs @ 49ers'."""
-        return f"{self.away_team} @ {self.home_team}"
+        away_prefix = f"{self.away_rank} " if self.away_rank else ""
+        home_prefix = f"{self.home_rank} " if self.home_rank else ""
+        return f"{away_prefix}{self.away_team} @ {home_prefix}{self.home_team}"
 
     @property
     def score_display(self) -> str:

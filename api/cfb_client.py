@@ -1,6 +1,6 @@
 """
 College Football (CFB) API Client (CollegeFootballData.com).
-Fetches and parses NCAA Football games with rate-limiting, caching, and demo fallback.
+Fetches and parses NCAA Football games with rate-limiting, caching, rankings, records, and stadium weather.
 """
 
 from typing import List, Tuple, Optional
@@ -8,10 +8,11 @@ from config import (
     CFBD_API_KEY,
     CFBD_SCOREBOARD_URL,
     CFBD_MIN_INTERVAL_SECONDS,
-    CACHE_TTL_LIVE_GAMES,
-    CACHE_TTL_STATIC_GAMES
+    CACHE_TTL_LIVE_GAMES
 )
 from models.game import Game
+from models.team_colors import get_team_color
+from api.weather_service import get_venue_weather
 from api.base_client import BaseClient
 
 
@@ -24,9 +25,6 @@ class CFBClient(BaseClient):
     def get_games_for_date(self, target_date_str: str) -> Tuple[List[Game], bool, Optional[str]]:
         """
         Fetches College Football games for today/specified date.
-        
-        Returns:
-            (games_list, is_cached, message)
         """
         # If no API key is provided, return rich mock data
         if not CFBD_API_KEY or CFBD_API_KEY == "your_cfbd_api_key_here":
@@ -73,11 +71,11 @@ class CFBClient(BaseClient):
                     status = "Scheduled"
                     period_str = "Pre-game"
 
-                home_rank = f"#{home.get('ranking')} " if home.get("ranking") else ""
-                away_rank = f"#{away.get('ranking')} " if away.get("ranking") else ""
+                home_rank = f"#{home.get('ranking')}" if home.get("ranking") else None
+                away_rank = f"#{away.get('ranking')}" if away.get("ranking") else None
 
-                home_name = f"{home_rank}{home.get('name', 'Home Team')}"
-                away_name = f"{away_rank}{away.get('name', 'Away Team')}"
+                home_name = home.get("name", "Home Team")
+                away_name = away.get("name", "Away Team")
 
                 venue_info = item.get("venue", {})
                 venue_name = venue_info.get("name", "College Stadium") if isinstance(venue_info, dict) else str(venue_info)
@@ -90,11 +88,18 @@ class CFBClient(BaseClient):
                     away_team=away_name,
                     home_score=home.get("points"),
                     away_score=away.get("points"),
+                    home_record=home.get("record"),
+                    away_record=away.get("record"),
+                    home_rank=home_rank,
+                    away_rank=away_rank,
+                    home_color=get_team_color(home_name, "CFB"),
+                    away_color=get_team_color(away_name, "CFB"),
                     status=status,
                     start_time=start_date[:16].replace("T", " "),
                     period_or_quarter=period_str,
                     venue=venue_name,
                     broadcast=item.get("tv", "ESPN"),
+                    weather=get_venue_weather(venue_name),
                     is_live=is_live
                 )
                 games_list.append(game)
@@ -108,62 +113,90 @@ class CFBClient(BaseClient):
             return self._get_mock_cfb_games(target_date_str), False, f"Parser error: {str(e)} (Demo Data)"
 
     def _get_mock_cfb_games(self, date_str: str) -> List[Game]:
-        """Provides realistic mock CFB games for demonstration and testing."""
+        """Provides realistic mock CFB games enriched with rankings, records, colors, and weather."""
         return [
             Game(
                 id="mock_cfb_1",
                 sport="CFB",
-                home_team="#1 Georgia",
-                away_team="#14 Clemson",
+                home_team="Georgia",
+                away_team="Clemson",
                 home_score=34,
                 away_score=3,
+                home_rank="#1",
+                away_rank="#14",
+                home_record="12-1",
+                away_record="9-3",
+                home_color=get_team_color("Georgia", "CFB"),
+                away_color=get_team_color("Clemson", "CFB"),
                 status="Final",
                 start_time=f"{date_str} 12:00 PM ET",
                 period_or_quarter="Final",
                 venue="Mercedes-Benz Stadium (Atlanta)",
                 broadcast="ABC",
+                weather=get_venue_weather("Mercedes-Benz Stadium"),
                 is_live=False
             ),
             Game(
                 id="mock_cfb_2",
                 sport="CFB",
-                home_team="#7 Notre Dame",
-                away_team="#20 Texas A&M",
+                home_team="Texas A&M",
+                away_team="Notre Dame",
                 home_score=13,
                 away_score=23,
+                home_rank="#20",
+                away_rank="#7",
+                home_record="8-4",
+                away_record="11-1",
+                home_color=get_team_color("Texas A&M", "CFB"),
+                away_color=get_team_color("Notre Dame", "CFB"),
                 status="Final",
                 start_time=f"{date_str} 7:30 PM ET",
                 period_or_quarter="Final",
                 venue="Kyle Field (College Station)",
                 broadcast="ABC",
+                weather=get_venue_weather("Kyle Field"),
                 is_live=False
             ),
             Game(
                 id="mock_cfb_3",
                 sport="CFB",
-                home_team="#2 Ohio State",
-                away_team="#3 Texas",
+                home_team="Ohio State",
+                away_team="Texas",
                 home_score=21,
                 away_score=24,
+                home_rank="#2",
+                away_rank="#3",
+                home_record="11-1",
+                away_record="11-1",
+                home_color=get_team_color("Ohio State", "CFB"),
+                away_color=get_team_color("Texas", "CFB"),
                 status="Live",
                 start_time=f"{date_str} 8:00 PM ET",
                 period_or_quarter="Q4 3:12",
                 venue="Ohio Stadium (Columbus)",
                 broadcast="FOX",
+                weather=get_venue_weather("Ohio Stadium"),
                 is_live=True
             ),
             Game(
                 id="mock_cfb_4",
                 sport="CFB",
-                home_team="#5 Alabama",
-                away_team="#8 LSU",
+                home_team="Alabama",
+                away_team="LSU",
                 home_score=None,
                 away_score=None,
+                home_rank="#5",
+                away_rank="#8",
+                home_record="9-3",
+                away_record="8-4",
+                home_color=get_team_color("Alabama", "CFB"),
+                away_color=get_team_color("LSU", "CFB"),
                 status="Scheduled",
                 start_time=f"{date_str} 7:30 PM ET",
                 period_or_quarter="Pre-game",
                 venue="Bryant-Denny Stadium",
                 broadcast="ESPN",
+                weather=get_venue_weather("Bryant-Denny Stadium"),
                 is_live=False
             ),
         ]

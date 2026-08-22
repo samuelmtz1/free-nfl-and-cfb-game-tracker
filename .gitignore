@@ -1,0 +1,36 @@
+# ==========================================
+# 1. API Keys & Environment Variables (CRITICAL)
+# ==========================================
+.env
+.env.*
+*.env
+# Keep the example template tracked
+!.env.example
+
+# ==========================================
+# 2. Local Database & Cache
+# ==========================================
+*.sqlite
+*.sqlite3
+*.db
+cache/
+*.cache
+
+# ==========================================
+# 3. Python Cache & Virtual Environments
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+ENV/
+
+# ==========================================
+# 4. OS & Editor Artifacts
+# ==========================================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

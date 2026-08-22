@@ -1,0 +1,11 @@
+# Core Networking & API Client
+requests>=2.31.0
+
+# Security & Environment Variables
+python-dotenv>=1.0.0
+
+# Customizable GUI Framework
+customtkinter>=5.2.0
+
+# Packaging utility
+packaging>=23.0

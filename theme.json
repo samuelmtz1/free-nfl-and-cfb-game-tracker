@@ -1,0 +1,26 @@
+{
+  "theme_name": "Modern Stadium Dark",
+  "mode": "dark",
+  "colors": {
+    "background": "#0f172a",
+    "surface": "#1e293b",
+    "surface_hover": "#334155",
+    "primary": "#3b82f6",
+    "primary_hover": "#2563eb",
+    "accent_nfl": "#38bdf8",
+    "accent_cfb": "#f97316",
+    "text_main": "#f8fafc",
+    "text_muted": "#94a3b8",
+    "badge_live": "#ef4444",
+    "badge_final": "#64748b",
+    "badge_scheduled": "#10b981",
+    "border": "#334155"
+  },
+  "fonts": {
+    "title": ["Helvetica", 20, "bold"],
+    "subtitle": ["Helvetica", 14, "bold"],
+    "body": ["Helvetica", 12, "normal"],
+    "score": ["Helvetica", 22, "bold"],
+    "badge": ["Helvetica", 10, "bold"]
+  }
+}

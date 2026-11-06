@@ -4,7 +4,7 @@ A desktop dashboard built with **Python**, **CustomTkinter**, and **SQLite** tha
 
 ---
 
-## 🔒 Guaranteed API Key Leak Protection
+## 🔒 API Key Handling
 
 This repository is pre-configured with industry-standard security practices so your private keys are **never pushed to GitHub**:
 
